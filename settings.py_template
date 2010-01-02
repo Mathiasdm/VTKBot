@@ -19,10 +19,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from core import VTKBotFactory
-
-from twisted.internet import reactor
-
-factory = VTKBotFactory(nickname=settings.core_nickname, server=settings.core_server, channels=settings.core_channels)
-reactor.connectTCP(settings.core_server, factory)
-reactor.run()
+core_nickname = "VTKBot"
+core_server = "vtk.ugent.be"
+core_channels = ["#test", "#test2"]

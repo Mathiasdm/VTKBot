@@ -1,0 +1,3 @@
+To use VTKBot, you need to follow these steps:
+- copy settings.py_template to settings.py and modify the settings as you wish
+- run 'python main.py'
