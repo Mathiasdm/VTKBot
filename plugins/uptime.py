@@ -19,10 +19,17 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from core import *
+from plugin import Plugin
+from datetime import datetime
+import re
 
-from twisted.internet import reactor
+class Uptime(Plugin):
 
-factory = VTKBotFactory(nickname="VTKBot", server="vtk.ugent.be", channels=["#vtk"])
-reactor.connectTCP("localhost", 9999, factory)
-reactor.run()
+    def __init__(self, factory):
+        Plugin.__init__(self, factory)
+        self.channel_message_rule = "(?i)%s: uptime" % factory.nickname
+        self.load_time = datetime.now()
+
+    def on_channel_message(self, vtkbot, nick, nickmask, hostmask, channel, message, match):
+        uptime = datetime.now() - self.load_time
+        vtkbot.send_channel_message(channel, "Ik ben al online gedurende %s dagen." % uptime.days)
