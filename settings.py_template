@@ -21,4 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 core_nickname = "VTKBot"
 core_server = "vtk.ugent.be"
-core_channels = ["#test", "#test2"]
+core_port = 6667
+core_channels = ["#vtk"]
+
+#plugin_list = ["help.py", "ping.py", "repeat.py", "say.py", "seen.py", "uptime.py"]

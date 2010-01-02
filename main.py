@@ -20,9 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from core import VTKBotFactory
+import settings
 
 from twisted.internet import reactor
 
 factory = VTKBotFactory(nickname=settings.core_nickname, server=settings.core_server, channels=settings.core_channels)
-reactor.connectTCP(settings.core_server, factory)
+reactor.connectTCP(settings.core_server, settings.core_port, factory)
 reactor.run()
