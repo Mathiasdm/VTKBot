@@ -282,8 +282,8 @@ class VTKBotFactory(ClientFactory):
                 continue
             try:
                 imp.load_source(candidate_file, candidate_file)
-            except Exception as i:
-                print i
+            except:
+                pass
 
         #See what classes we managed to load
         pluginclasses = Plugin.__subclasses__()
