@@ -28,7 +28,7 @@ from twisted.internet import reactor
 from sqlalchemy import create_engine
 
 import re
-import glob
+import os
 import imp
 
 from plugin import Plugin
@@ -276,12 +276,12 @@ class VTKBotFactory(ClientFactory):
 
     def load_plugins(self):
         #Load source code
-        candidate_files = glob.glob('./plugins/*.py')
-        for candidate_file in candidate_files:
+        for candidate_file in os.listdir('./plugins'):
             if settings.plugin_list and not self.endswith(candidate_file, settings.plugin_list): #There's a list of allowed plugins, and ours is not in it
                 continue
             try:
-                imp.load_source(candidate_file, candidate_file)
+                fp, pathname, description = imp.find_module(candidate_file[:-3], ['./plugins'])
+                imp.load_module(candidate_file[:-3], fp, pathname, description)
             except:
                 pass
 
