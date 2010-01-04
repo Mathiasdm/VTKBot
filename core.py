@@ -275,11 +275,18 @@ class VTKBotFactory(ClientFactory):
         self.channels = channels
         self.load_plugins()
 
+    def setting_defined(self, setting):
+        try:
+            setting
+            return True
+        except NameError:
+            return False
+
     def load_plugins(self):
         #Load source code
         for candidate_file in os.listdir('./plugins'):
-            if settings.plugin_list and not self.endswith(candidate_file, settings.plugin_list): #There's a list of allowed plugins, and ours is not in it
-                continue
+            if hasattr(settings, 'plugin_list') and not self.endswith(candidate_file, settings.plugin_list): 
+                continue #There's a list of allowed plugins, and ours is not in it
             try:
                 fp, pathname, description = imp.find_module(candidate_file[:-3], ['./plugins'])
                 imp.load_module(candidate_file[:-3], fp, pathname, description)
