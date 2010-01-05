@@ -290,8 +290,8 @@ class VTKBotFactory(ClientFactory):
             try:
                 fp, pathname, description = imp.find_module(candidate_file[:-3], ['./plugins'])
                 imp.load_module(candidate_file[:-3], fp, pathname, description)
-            except:
-                pass
+            except Exception, (instance):
+                print instance
 
         #See what classes we managed to load
         pluginclasses = Plugin.__subclasses__()
