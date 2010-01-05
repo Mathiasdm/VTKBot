@@ -32,12 +32,11 @@ class Quote(Plugin):
         self.channel_message_rule = "%s: quote" % self.factory.nickname
 
     def on_channel_message(self, vtkbot, nick, nickmask, hostmask, channel, message, match):
-        print 'MATCH!'
         session = self.Session()
         match = re.match("%s: quote$" % self.factory.nickname, message)
         if match:
             #Random quote
-            quotes = session.query(Quote).all()
+            quotes = session.query(QuoteObject).all()
             if (quotes == None) or (len(quotes) == 0):
                 vtkbot.send_channel_message(channel, "Geen quotes gevonden.")
                 return
@@ -48,7 +47,7 @@ class Quote(Plugin):
         match = re.match("%s: quote ([^\s]*)$" % self.factory.nickname, message)
         if match:
             #Random quote from user
-            quotes = session.query(Quote).filter_by(user=match.group(1)).all()
+            quotes = session.query(QuoteObject).filter_by(user=match.group(1)).all()
             if (quotes == None) or (len(quotes) == 0):
                 vtkbot.send_channel_message(channel, "Geen quotes van %s gevonden." % match.group(1))
                 return
@@ -61,7 +60,7 @@ class Quote(Plugin):
             #Add quote
             user = match.group(1)
             text = match.group(2)
-            quote = Quote(user, channel, text)
+            quote = QuoteObject(user, channel, text)
             session.save_or_update(quote)
             session.commit()
             vtkbot.send_channel_message(channel, "Quote toegevoegd.")
@@ -80,13 +79,13 @@ class Quote(Plugin):
             Column('text', Unicode(length=150)),
         )
         try:
-            mapper(Quote, quotes_table)
+            mapper(QuoteObject, quotes_table)
         except: #This is for mapper reloads -- unloading the mappers doesn't seem to work
             pass
         metadata.create_all(self.factory.engine)
         self.Session = sessionmaker(bind=self.factory.engine)
 
-class Quote(object):
+class QuoteObject(object):
     def __init__(self, user, channel, text):
         self.user = user
         self.channel = channel

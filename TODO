@@ -3,7 +3,9 @@
     * TOP x scores
     * Show scores for a player
     * Welcome players to the channel (or perhaps this should be a separate plugin? a greet plugin)
-- Unit tests!
+    * Colours
+- Unit tests! (in progress)
+- Switch to a logging framework
 - Wikipedia/google plugin
 - Page title plugin
 - Explanation plugin (Botname: explain WORD)

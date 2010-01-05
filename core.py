@@ -26,6 +26,7 @@ from twisted.internet.protocol import ClientFactory
 from twisted.internet import reactor
 
 from sqlalchemy import create_engine
+from sqlalchemy.orm import clear_mappers
 
 import re
 import os
@@ -110,6 +111,7 @@ class VTKBot(LineOnlyReceiver):
     def lineReceived(self, message):
         print message
         message = message.decode('utf-8')
+        message = message.replace('\r', '').replace('\n', '')
 
         #INVITE message
         match = re.match(":([^ ]*?)!([^ ]*?)@([^ ]*?) INVITE ([^ ]*?) :(.*)", message)
@@ -275,26 +277,29 @@ class VTKBotFactory(ClientFactory):
         self.channels = channels
         self.load_plugins()
 
-    def setting_defined(self, setting):
-        try:
-            setting
-            return True
-        except NameError:
-            return False
-
     def load_plugins(self):
+
+        #Clear sqlalchemy data from old plugins
+        clear_mappers()
+
         #Load source code
-        for candidate_file in os.listdir('./plugins'):
-            if hasattr(settings, 'plugin_list') and not self.endswith(candidate_file, settings.plugin_list): 
+        if hasattr(settings, 'plugin_dir'):
+            plugin_dir = settings.plugin_dir
+        else:
+            plugin_dir = 'plugins'
+
+        for candidate_file in os.listdir(plugin_dir):
+            if hasattr(settings, 'plugin_list') and not (candidate_file in settings.plugin_list):
                 continue #There's a list of allowed plugins, and ours is not in it
             try:
-                fp, pathname, description = imp.find_module(candidate_file[:-3], ['./plugins'])
-                imp.load_module(candidate_file[:-3], fp, pathname, description)
+                module = __import__(plugin_dir + '.' + candidate_file[:-3])
+                reload(module)
             except Exception, (instance):
                 print instance
 
         #See what classes we managed to load
         pluginclasses = Plugin.__subclasses__()
+
         print 'Plugins: ' + str(pluginclasses)
         self.plugins = []
         for pluginclass in pluginclasses:

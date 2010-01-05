@@ -1,0 +1,10 @@
+Run 'python tests.py' to run the VTKBot tests.
+To see how well the coverage of the source files is,
+run the tests with python-coverage: 'python-coverage  -x tests.py'
+Afterwards, you can check the coverage of a file with:
+'python-coverage -r FILENAME'
+
+Major points for writing tests:
+    - Try to get coverage as high as possible (for example, the Quote and Ping plugin, as well as the VTKBotFactory have coverage on every method)
+    - Look for edge case and try these out (empty texts, special characters, ...)
+    - Keep an eye on performance, by running tests a number of times
