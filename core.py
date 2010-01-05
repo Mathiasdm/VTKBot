@@ -58,9 +58,10 @@ class VTKBot(LineOnlyReceiver):
 
     #Send a raw IRC message
     def send_message(self, message):
-        message = message.encode('utf-8')
+        message = message + '\n'
+        message = message.encode('utf-8', 'ignore')
         print message
-        self.transport.write(message + '\n')
+        self.transport.write(message)
 
     #Send PONG back after receiving ping
     def send_pong(self, target):
@@ -110,7 +111,15 @@ class VTKBot(LineOnlyReceiver):
     #Received a raw IRC message
     def lineReceived(self, message):
         print message
-        message = message.decode('utf-8')
+        #Try to decode the message -- http://en.wikipedia.org/wiki/Internet_Relay_Chat#Character_encoding
+        try:
+            message = message.decode('utf-8')
+        except:
+            try:
+                message = message.decode('iso-8859-1')
+            except:
+                message = message.decode('utf-8', 'ignore')
+
         message = message.replace('\r', '').replace('\n', '')
 
         #INVITE message

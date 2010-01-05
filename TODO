@@ -6,6 +6,8 @@
     * Colours
 - Unit tests! (in progress)
 - Switch to a logging framework
+- Add more comments
+- More variable name consistency
 - Wikipedia/google plugin
 - Page title plugin
 - Explanation plugin (Botname: explain WORD)

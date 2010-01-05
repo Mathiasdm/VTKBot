@@ -253,7 +253,7 @@ class TestQuotePlugin(unittest.TestCase):
                 self.runQuote(u"%s: quote %s %s" % (self.factory.nickname, name, sentence))
         after = datetime.now()
         diff = after - before
-        self.assert_(diff.seconds < 10)
+        self.assert_(diff.seconds < len(names)*len(sentences)/10) #10 quotes/second
 
         #Request quotes
         before = datetime.now()
