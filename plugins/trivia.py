@@ -108,8 +108,8 @@ class Trivia(Plugin):
         vtkbot.send_channel_message(channel, "Top scores op %s:" % channel)
         session = self.Session()
         users = session.query(User).filter_by(channel=channel).order_by(desc('score'))[:count]
-        for user in users:
-            vtkbot.send_channel_message(channel, "%s: %s punten voor %s vragen" % (user.nickname, user.score, user.questioncount))
+        for index, user in enumerate(users, start=1):
+            vtkbot.send_channel_message(channel, "%1. %s: %s punten voor %s vragen" % (index, user.nickname, user.score, user.questioncount))
 
     def on_point_change(self, vtkbot, channel, nick, change):
         session = self.Session()
