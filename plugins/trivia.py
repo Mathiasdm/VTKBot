@@ -23,7 +23,7 @@ from core import Plugin
 import re
 from sqlalchemy import create_engine, func, select, Table, Column, Integer, Unicode, MetaData, DateTime, String, ForeignKey
 from sqlalchemy.orm import mapper, sessionmaker
-from sqlalchemy.sql.expression import asc
+from sqlalchemy.sql.expression import asc, desc
 from random import randint
 from twisted.internet import reactor
 from twisted.internet import task
@@ -107,7 +107,7 @@ class Trivia(Plugin):
     def on_trivia_top(self, vtkbot, channel, count=10):
         vtkbot.send_channel_message(channel, "Top scores op %s:" % channel)
         session = self.Session()
-        users = session.query(User).filter_by(channel=channel).order_by(asc('score'))[:count]
+        users = session.query(User).filter_by(channel=channel).order_by(desc('score'))[:count]
         for user in users:
             vtkbot.send_channel_message(channel, "%s: %s punten voor %s vragen" % (user.nickname, user.score, user.questioncount))
 
