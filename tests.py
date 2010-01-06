@@ -267,6 +267,28 @@ class TestQuotePlugin(unittest.TestCase):
         diff = after - before
         self.assert_(diff.seconds < len(names)*len(sentences)/50) #Reading is done much more often than writing, so it needs to be much faster
 
+    def testUserQuoteSpaces(self):
+        "Make sure quotes with only whitespace do not get added."
+        session = self.quote_plugin.Session()
+
+        quotes = session.query(QuoteObject).all()
+        self.assertEquals(0, len(quotes))
+
+        self.runQuote("%s: quote  blah blih" % self.factory.nickname) #Quote with an empty username and non-empty text
+        quotes = session.query(QuoteObject).all()
+
+        self.assertEquals(0, len(quotes))
+
+        self.runQuote("%s: quote blah    " % self.factory.nickname) #Quote with a non-empty username and non-empty text
+        quotes = session.query(QuoteObject).all()
+
+        self.assertEquals(0, len(quotes))
+
+        self.runQuote("%s: quote     " % self.factory.nickname) #Quote with an empty username and empty text
+        quotes = session.query(QuoteObject).all()
+
+        self.assertEquals(0, len(quotes))
+
 class TestTriviaPlugin(unittest.TestCase):
     def setUp(self):
         settings.plugin_list = ["trivia.py"]
@@ -318,10 +340,11 @@ class TestTriviaPlugin(unittest.TestCase):
         self.assert_(diff.seconds < questions_asked/20) #Questions need to be asked as fast as possible, to avoid long delays for the trivia players
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestTriviaPlugin)
-    unittest.TextTestRunner(verbosity=2).run(suite)
 
     suite = unittest.TestLoader().loadTestsFromTestCase(TestQuotePlugin)
+    unittest.TextTestRunner(verbosity=2).run(suite)
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestTriviaPlugin)
     unittest.TextTestRunner(verbosity=2).run(suite)
 
     suite = unittest.TestLoader().loadTestsFromTestCase(TestPingPlugin)
