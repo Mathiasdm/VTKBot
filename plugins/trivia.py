@@ -49,6 +49,11 @@ class Trivia(Plugin):
             self.trivia_started[channel] = False
 
     def on_channel_message(self, vtkbot, nick, nickmask, hostmask, channel, message, match):
+        match = re.match("%s: trivia top$" % self.factory.nickname, message)
+        if match:
+            self.on_trivia_top(vtkbot, channel)
+            return
+
         if self.trivia_started[channel]:
             match = re.match("%s: trivia stop" % self.factory.nickname, message)
             if match:
@@ -98,6 +103,13 @@ class Trivia(Plugin):
                     pass
         self.trivia_started[channel] = False
         vtkbot.send_channel_message(channel, "Trivia gestopt!")
+
+    def on_trivia_top(self, vtkbot, channel, count=10):
+        vtkbot.send_channel_message(channel, "Top scores op %s:" % channel)
+        session = self.Session()
+        users = session.query(User).filter_by(channel=channel).order_by(asc('score'))[:count]
+        for user in users:
+            vtkbot.send_channel_message(channel, "%s: %s punten voor %s vragen" % (user.nickname, user.score, user.questioncount))
 
     def on_point_change(self, vtkbot, channel, nick, change):
         session = self.Session()

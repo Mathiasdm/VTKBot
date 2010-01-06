@@ -12,7 +12,7 @@ import time
 from core import VTKBot, VTKBotFactory
 from plugin import Plugin
 from plugins.quote import QuoteObject
-from plugins.trivia import Trivia, RegularQuestion
+from plugins.trivia import Trivia, RegularQuestion, User
 
 def generate_random_word(min_length, max_length):
     length = randint(min_length, max_length)
@@ -42,7 +42,7 @@ class MockVTKBotFactory(VTKBotFactory):
     protocol = MockVTKBot
 
     def __init__(self, realname="RealName", host="localhost", server="localhost", port=9999, nickname="NickName", username="UserName",
-            databasefile="sqlite:///test.db", channels=["#test", "#test2"]):
+            databasefile="sqlite:///test.db", channels=[u"#test", u"#test2"]):
         self.nickname = nickname
         self.username = username
         self.realname = realname
@@ -324,7 +324,7 @@ class TestTriviaPlugin(unittest.TestCase):
         session.commit()
 
         #Load questions and check the amount of time it takes
-        questions_asked = 100
+        questions_asked = 5000
         before = datetime.now()
         for i in range(questions_asked):
             self.trivia_plugin.on_next_question(self.vtkbot, self.channel)
@@ -336,8 +336,36 @@ class TestTriviaPlugin(unittest.TestCase):
                     pass
         after = datetime.now()
         diff = after - before
-        print diff
         self.assert_(diff.seconds < questions_asked/20) #Questions need to be asked as fast as possible, to avoid long delays for the trivia players
+
+    def testTriviaTop(self):
+        "Check if the top trivia players are listed correctly."
+        self.vtkbot.message_list = []
+
+        session = self.trivia_plugin.Session()
+        channels = [u"#channel1", u"#channel2"]
+        players = {}
+
+        self.trivia_plugin.on_trivia_top(self.vtkbot, channels[0]) #See if the method crashes anything when no scores are present
+
+        for channel in channels:
+            players[channel] = []
+            for i in range(5):
+                name = generate_random_word(5, 30)
+                score = randint(1, 1000)
+                questioncount = randint(1, 20)
+                user = User(name, channel, score, questioncount)
+                session.save_or_update(user)
+        session.commit()
+
+        self.trivia_plugin.on_trivia_top(self.vtkbot, channels[0])
+        for player in players[channels[0]]:
+            occurs = False
+            for message in self.vtkbot.message_list:
+                if message.find(player) >= 0:
+                    occurs = True
+                    break
+            self.assert_(occurs)
 
 if __name__ == '__main__':
 

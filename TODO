@@ -10,6 +10,9 @@
         * Show scores for a player
         * Welcome players to the channel (or perhaps this should be a separate plugin? a greet plugin)
         * Colours
+        * Stop automatically when nobody answers for a few questions in a row
+        * Points for answering X questions in a row when there are other players competing
+        * Skip/stop by vote
     - Self kick plugin
     - Explanation plugin (Botname: explain WORD)
     - Wikipedia/google plugin
