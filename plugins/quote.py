@@ -20,9 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from core import Plugin
-from sqlalchemy import create_engine, Table, Column, Integer, Unicode, MetaData
+from sqlalchemy import create_engine, func, select, Table, Column, Integer, Unicode, MetaData
 from sqlalchemy.orm import mapper, sessionmaker
-from random import choice
+from sqlalchemy.sql.expression import asc
+from random import choice, randint
 import re
 
 class Quote(Plugin):
@@ -36,12 +37,13 @@ class Quote(Plugin):
         match = re.match("%s: quote$" % self.factory.nickname, message)
         if match:
             #Random quote
-            quotes = session.query(QuoteObject).all()
-            if (quotes == None) or (len(quotes) == 0):
+            max_quote = session.query(QuoteObject).filter(QuoteObject.id == func.max(QuoteObject.id).select()).first()
+            if max_quote == None:
                 vtkbot.send_channel_message(channel, "Geen quotes gevonden.")
                 return
-            quote = choice(quotes)
-            vtkbot.send_channel_message(channel, "<%s> %s" % (quote.user, quote.text))
+            quote_id = randint(1, max_quote.id)
+            quote = session.query(QuoteObject).filter(QuoteObject.id >= quote_id).order_by(asc('id')).first()
+            vtkbot.send_channel_message(channel, "Quote %s: <%s> %s" % (quote.id, quote.user, quote.text))
             return
 
         match = re.match("%s: quote ([^\s]*)$" % self.factory.nickname, message)

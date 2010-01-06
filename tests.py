@@ -7,10 +7,12 @@ from twisted.internet import reactor
 from sqlalchemy import create_engine
 from sets import Set
 from random import randint
+import time
 
 from core import VTKBot, VTKBotFactory
 from plugin import Plugin
 from plugins.quote import QuoteObject
+from plugins.trivia import Trivia, RegularQuestion
 
 def generate_random_word(min_length, max_length):
     length = randint(min_length, max_length)
@@ -145,6 +147,7 @@ class TestQuotePlugin(unittest.TestCase):
             pass
 
     def runQuote(self, quotetext):
+        "Generate a basic 'receive a quote' message."
         self.vtkbot.on_channel_message(self.sender_nick, self.sender_nickmask, self.sender_host, self.channel, quotetext)
 
     def testQuotes(self):
@@ -243,7 +246,7 @@ class TestQuotePlugin(unittest.TestCase):
         sentences = []
         for i in range(5):
             names.append(generate_random_word(10,30))
-        for i in range(20):
+        for i in range(200):
             sentences.append(generate_random_sentence(5, 20, 10, 30))
 
         #Send quotes
@@ -253,7 +256,7 @@ class TestQuotePlugin(unittest.TestCase):
                 self.runQuote(u"%s: quote %s %s" % (self.factory.nickname, name, sentence))
         after = datetime.now()
         diff = after - before
-        self.assert_(diff.seconds < len(names)*len(sentences)/10) #10 quotes/second
+        self.assert_(diff.seconds < len(names)*len(sentences)/5) #We want at least a few requests per seconds. If a request takes too long, it'll give us a backlog
 
         #Request quotes
         before = datetime.now()
@@ -262,9 +265,62 @@ class TestQuotePlugin(unittest.TestCase):
                 self.runQuote(u"%s: quote" % (self.factory.nickname))
         after = datetime.now()
         diff = after - before
-        self.assert_(diff.seconds < 10)
+        self.assert_(diff.seconds < len(names)*len(sentences)/50) #Reading is done much more often than writing, so it needs to be much faster
+
+class TestTriviaPlugin(unittest.TestCase):
+    def setUp(self):
+        settings.plugin_list = ["trivia.py"]
+        self.factory = MockVTKBotFactory(nickname=settings.core_nickname, server=settings.core_server, channels=settings.core_channels)
+        self.vtkbot = self.factory.buildProtocol(('localhost', 9999))
+        self.sender_nick = "blah"
+        self.sender_nickmask = "blih"
+        self.sender_host = "somehost.com"
+        self.channel = "#test"
+
+        for plugin in self.factory.plugins:
+            if plugin.__class__.__name__ == "Trivia":
+                self.trivia_plugin = plugin
+
+    def tearDown(self):
+        try:
+            os.remove(self.factory.databasefile)
+        except:
+            pass
+
+    def testQuestionLoadSpeed(self):
+        "Check if trivia questions load fast enough."
+
+        session = self.trivia_plugin.Session()
+
+        #Create questions
+        for i in range(40000): #There can be a lot of trivia questions
+            question_string = generate_random_sentence(5, 10, 5, 20)
+            answer_string = generate_random_sentence(1, 6, 1, 20)
+            category_string = generate_random_word(10, 30)
+            question = RegularQuestion(question = question_string, answer = answer_string, category = category_string)
+            session.save_or_update(question)
+        session.commit()
+
+        #Load questions and check the amount of time it takes
+        questions_asked = 100
+        before = datetime.now()
+        for i in range(questions_asked):
+            self.trivia_plugin.on_next_question(self.vtkbot, self.channel)
+            timers = reactor.getDelayedCalls()
+            for timer in timers:
+                try:
+                    timer.cancel()
+                except:
+                    pass
+        after = datetime.now()
+        diff = after - before
+        print diff
+        self.assert_(diff.seconds < questions_asked/20) #Questions need to be asked as fast as possible, to avoid long delays for the trivia players
 
 if __name__ == '__main__':
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestTriviaPlugin)
+    unittest.TextTestRunner(verbosity=2).run(suite)
+
     suite = unittest.TestLoader().loadTestsFromTestCase(TestQuotePlugin)
     unittest.TextTestRunner(verbosity=2).run(suite)
 

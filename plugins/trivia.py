@@ -21,8 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from core import Plugin
 import re
-from sqlalchemy import create_engine, Table, Column, Integer, Unicode, MetaData, DateTime, String, ForeignKey
+from sqlalchemy import create_engine, func, select, Table, Column, Integer, Unicode, MetaData, DateTime, String, ForeignKey
 from sqlalchemy.orm import mapper, sessionmaker
+from sqlalchemy.sql.expression import asc
 from random import randint
 from twisted.internet import reactor
 from twisted.internet import task
@@ -40,7 +41,7 @@ class Trivia(Plugin):
     def __init__(self, factory):
         Plugin.__init__(self, factory)
         self.channel_message_rule = "(.*)"
-        self.trivia_started = {}
+        self.trivia_started = {} #Dict with channel name and boolean to see if the trivia is busy on that channel
         self.questions = {}
         self.answered = {}
         self.timers = {}
@@ -85,15 +86,16 @@ class Trivia(Plugin):
 
     def on_trivia_start(self, vtkbot, channel):
         self.trivia_started[channel] = True
-        vtkbot.send_channel_message(channel, "Trivia gestart!")
+        vtkbot.send_channel_message(channel, chr(3) + '2' + "Trivia gestart!" + chr(3))
         self.on_next_question(vtkbot, channel)
 
     def on_trivia_stop(self, vtkbot, channel):
-        for timer in self.timers[channel]:
-            try:
-                timer.cancel()
-            except:
-                pass
+        if channel in self.timers:
+            for timer in self.timers[channel]:
+                try:
+                    timer.cancel()
+                except:
+                    pass
         self.trivia_started[channel] = False
         vtkbot.send_channel_message(channel, "Trivia gestopt!")
 
@@ -112,13 +114,15 @@ class Trivia(Plugin):
     def on_next_question(self, vtkbot, channel):
         #Get a question from the database
         session = self.Session()
-        questions = session.query(Question).all() #TODO: This is not good :p
-        if len(questions) == 0:
+        max_question = session.query(Question).filter(Question.question_id == func.max(Question.question_id).select()).first()
+        if max_question == None:
             vtkbot.send_channel_message(channel, "Ik heb geen vragen! :(")
+            self.on_trivia_stop(vtkbot, channel)
         else:
-            self.questions[channel] = questions[randint(0, len(questions)-1)]
-
-            self.questions[channel].start(vtkbot, channel, self)
+            question_id = randint(1, max_question.question_id)
+            question = session.query(Question).filter(Question.question_id >= question_id).order_by(asc('question_id')).first()
+            self.questions[channel] = question
+            reactor.callLater(0.1, self.questions[channel].start, vtkbot, channel, self)
 
     def on_help(self, vtkbot, channel):
         vtkbot.send_channel_message(channel, "Trivia is een spel waarbij je zo snel mogelijk de vragen juist moet beantwoorden.")
