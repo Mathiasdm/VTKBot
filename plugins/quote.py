@@ -57,7 +57,7 @@ class Quote(Plugin):
             vtkbot.send_channel_message(channel, "<%s> %s" % (quote.user, quote.text))
             return
 
-        match = re.match("%s: quote ([^\s]*) (.*)" % self.factory.nickname, message)
+        match = re.match("%s: quote ([^\s]*) (.*[^\s])" % self.factory.nickname, message)
         if match:
             #Add quote
             user = match.group(1)
