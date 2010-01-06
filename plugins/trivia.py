@@ -230,10 +230,10 @@ class RegularQuestion(Question):
 
     def nth_hint(self, vtkbot, channel, n, total_hints):
         self.score = self.score/2
-        answer_hint = self.answer
-        for i in range(1, len(answer_hint)):
-            if i%total_hints != n-1 and answer_hint[i] != ' ':
-                answer_hint = answer_hint[:i-1] + '.' + answer_hint[i:]
+        answer_hint = self.answer[:]
+        for i in range(len(answer_hint)):
+            if (i%total_hints != n-1) and (answer_hint[i] != ' '):
+                answer_hint = answer_hint[:i] + '.' + answer_hint[i+1:]
         vtkbot.send_channel_message(channel, "Hint %s: %s" % (n, answer_hint))
 
     def next_question(self, vtkbot, channel, trivia_plugin):
@@ -271,6 +271,9 @@ class RegularQuestion(Question):
             vtkbot.send_channel_message(channel, "%s heeft het correcte antwoord (%s) gegeven!" % (nickname, self.answer))
             trivia_plugin.on_point_change(vtkbot, channel, nickname, self.score)
             reactor.callLater(1, trivia_plugin.on_next_question, vtkbot, channel)
+        else:
+            if self.attempts[nickname] == 1:
+                vtkbot.send_channel_message(channel, "%s is uitgeschakeld!" % nickname)
 
     def __repr__(self):
         return u'<Question(%s, %s)>' % (self.question, self.answer)
