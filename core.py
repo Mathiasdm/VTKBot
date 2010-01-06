@@ -286,6 +286,16 @@ class VTKBotFactory(ClientFactory):
         self.channels = channels
         self.load_plugins()
 
+    def clientConnectionFailed(self, connector, reason):
+        "We didn't manage to establish a connection to the server. Wait some time before trying again."
+        print 'Failed to establish a connection to the server. Trying again later...'
+        reactor.callLater(180, connector.connect)
+
+    def clientConnectionLost(self, connector, reason):
+        "We lost the connection to the server. Try again."
+        print 'Lost connection to the server. Trying again...'
+        connector.connect()
+
     def load_plugins(self):
 
         #Clear sqlalchemy data from old plugins
