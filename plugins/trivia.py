@@ -58,7 +58,7 @@ class Trivia(Plugin):
             if match:
                 self.questions[channel].on_skip(vtkbot, channel, self)
                 return
-            elif not self.answered[channel]:
+            elif (not channel in self.answered) or not self.answered[channel]:
                 self.questions[channel].on_answer(vtkbot, nick, channel, message, self) #Somebody answered, the Question class will check if the answer's correct
                 return
         else:
@@ -271,7 +271,7 @@ class RegularQuestion(Question):
             vtkbot.send_channel_message(channel, "%s heeft het correcte antwoord (%s) gegeven!" % (nickname, self.answer))
             trivia_plugin.on_point_change(vtkbot, channel, nickname, self.score)
             reactor.callLater(1, trivia_plugin.on_next_question, vtkbot, channel)
-        else:
+        else if is_number(self.answer):
             if self.attempts[nickname] == 1:
                 vtkbot.send_channel_message(channel, "%s is uitgeschakeld!" % nickname)
 
