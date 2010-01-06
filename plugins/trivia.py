@@ -91,7 +91,7 @@ class Trivia(Plugin):
 
     def on_trivia_start(self, vtkbot, channel):
         self.trivia_started[channel] = True
-        vtkbot.send_channel_message(channel, chr(3) + '2' + "Trivia gestart!" + chr(3))
+        vtkbot.send_channel_message(channel, "Trivia gestart!", "BLUE")
         self.on_next_question(vtkbot, channel)
 
     def on_trivia_stop(self, vtkbot, channel):
@@ -102,14 +102,14 @@ class Trivia(Plugin):
                 except:
                     pass
         self.trivia_started[channel] = False
-        vtkbot.send_channel_message(channel, "Trivia gestopt!")
+        vtkbot.send_channel_message(channel, "Trivia gestopt!", "BLUE")
 
     def on_trivia_top(self, vtkbot, channel, count=10):
         vtkbot.send_channel_message(channel, "Top scores op %s:" % channel)
         session = self.Session()
         users = session.query(User).filter_by(channel=channel).order_by(desc('score'))[:count]
         for index, user in enumerate(users, start=1):
-            vtkbot.send_channel_message(channel, "%1. %s: %s punten voor %s vragen" % (index, user.nickname, user.score, user.questioncount))
+            vtkbot.send_channel_message(channel, "%s. %s: %s punten voor %s vragen" % (index, user.nickname, user.score, user.questioncount))
 
     def on_point_change(self, vtkbot, channel, nick, change):
         session = self.Session()
@@ -120,8 +120,8 @@ class Trivia(Plugin):
         user.score += change
         session.save_or_update(user)
         session.commit()
-        vtkbot.send_channel_message(channel, "%s krijgt %s punten!" % (nick, change))
-        vtkbot.send_channel_message(channel, "%s heeft nu in totaal %s punten voor %s vragen!" % (nick, user.score, user.questioncount))
+        vtkbot.send_channel_message(channel, "%s krijgt %s punten!" % (nick, change), bold=True)
+        vtkbot.send_channel_message(channel, "%s heeft nu in totaal %s punten voor %s vragen!" % (nick, user.score, user.questioncount), bold=True)
 
     def on_next_question(self, vtkbot, channel):
         #Get a question from the database
@@ -232,13 +232,15 @@ class RegularQuestion(Question):
             trivia_plugin.timers[channel] = [post_question, first_hint, second_hint, third_hint, fourth_hint, next_question]
 
     def post_question(self, vtkbot, channel):
-        question = "Gewone vraag %s: %s (%s: %s)" % (self.regularquestion_id, self.question, self.get_lengths(self.answer), self.get_dots(self.answer))
+        question = vtkbot.coloured_message("Gewone vraag", "BLUE")
+        question += " %s: %s (%s: %s)" % (self.regularquestion_id, self.question, self.get_lengths(self.answer), self.get_dots(self.answer))
         vtkbot.send_channel_message(channel, question)
 
     def post_number_question(self, vtkbot, channel):
-        question = "Getallenvraag %s: %s (%s: %s)" % (self.regularquestion_id, self.question, self.get_lengths(self.answer), self.get_dots(self.answer))
+        question = vtkbot.coloured_message("Getallenvraag", "BLUE")
+        question += " %s: %s (%s: %s)" % (self.regularquestion_id, self.question, self.get_lengths(self.answer), self.get_dots(self.answer))
         vtkbot.send_channel_message(channel, question)
-        vtkbot.send_channel_message(channel, "Voor deze vraag heb je maar 20 seconden tijd en slechts 2 pogingen!")
+        vtkbot.send_channel_message(channel, "Voor deze vraag heb je maar 20 seconden tijd en slechts 2 pogingen!", "RED")
 
     def nth_hint(self, vtkbot, channel, n, total_hints):
         self.score = self.score/2
@@ -285,7 +287,7 @@ class RegularQuestion(Question):
             reactor.callLater(1, trivia_plugin.on_next_question, vtkbot, channel)
         elif is_number(self.answer):
             if self.attempts[nickname] == 1:
-                vtkbot.send_channel_message(channel, "%s is uitgeschakeld!" % nickname)
+                vtkbot.send_channel_message(channel, "%s is uitgeschakeld!" % nickname, "RED")
 
     def __repr__(self):
         return u'<Question(%s, %s)>' % (self.question, self.answer)

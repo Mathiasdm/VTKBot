@@ -34,6 +34,14 @@ import imp
 
 from plugin import Plugin
 
+TEXT_COLOURS = {
+    "WHITE": "0",
+    "BLACK": "1",
+    "BLUE" : "2",
+    "GREEN": "3",
+    "RED"  : "4",
+}
+
 class VTKBot(LineOnlyReceiver):
 
     #========================
@@ -86,7 +94,11 @@ class VTKBot(LineOnlyReceiver):
     def send_user_mode(self, target, mode):
         self.send_message("MODE %s %s" % (target, mode))
 
-    def send_channel_message(self, channel, message):
+    def send_channel_message(self, channel, message, colour=None, bold=False):
+        if colour != None:
+            message = self.coloured_message(message, colour)
+        if bold == True:
+            message = self.bold_message(message)
         self.send_message("PRIVMSG %s :%s" % (channel, message))
 
     #Set channel modes
@@ -268,6 +280,16 @@ class VTKBot(LineOnlyReceiver):
     #A user quit
     def on_user_quit(self, nick, nickmask, hostmask):
         pass
+
+    #=======================
+    #  MODIFYING MESSAGES  #
+    #=======================
+
+    def coloured_message(self, message, colour):
+        return chr(3) + TEXT_COLOURS[colour] + message + chr(3)
+
+    def bold_message(self, message):
+        return chr(2) + message + chr(2)
 
 class VTKBotFactory(ClientFactory):
 
