@@ -58,9 +58,9 @@ class VTKBot(LineOnlyReceiver):
 
     #Send a raw IRC message
     def send_message(self, message):
-        message = message.encode('utf-8', 'ignore')
         print message
         message = message + '\n'
+        message = message.encode('utf-8', 'ignore')
         self.transport.write(message)
 
     #Send PONG back after receiving ping
