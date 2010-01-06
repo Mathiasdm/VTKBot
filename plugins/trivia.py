@@ -271,7 +271,7 @@ class RegularQuestion(Question):
             vtkbot.send_channel_message(channel, "%s heeft het correcte antwoord (%s) gegeven!" % (nickname, self.answer))
             trivia_plugin.on_point_change(vtkbot, channel, nickname, self.score)
             reactor.callLater(1, trivia_plugin.on_next_question, vtkbot, channel)
-        else if is_number(self.answer):
+        elif is_number(self.answer):
             if self.attempts[nickname] == 1:
                 vtkbot.send_channel_message(channel, "%s is uitgeschakeld!" % nickname)
 
