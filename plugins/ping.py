@@ -26,7 +26,7 @@ class Ping(Plugin):
 
     def __init__(self, factory):
         Plugin.__init__(self, factory)
-        self.channel_message_rule = "(?i)%s: ping" % factory.nickname
+        self.channel_message_rule = "(?i)%s:\s*ping" % factory.nickname
 
     def on_channel_message(self, vtkbot, nick, nickmask, hostmask, channel, message, match):
         vtkbot.send_channel_message(channel, "pong %s" % nick)
