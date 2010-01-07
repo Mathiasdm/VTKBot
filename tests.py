@@ -7,6 +7,7 @@ from twisted.internet import reactor
 from sqlalchemy import create_engine
 from sets import Set
 from random import randint
+import logging
 import time
 
 from core import VTKBot, VTKBotFactory
@@ -43,6 +44,8 @@ class MockVTKBotFactory(VTKBotFactory):
 
     def __init__(self, realname="RealName", host="localhost", server="localhost", port=9999, nickname="NickName", username="UserName",
             databasefile="sqlite:///test.db", channels=[u"#test", u"#test2"]):
+        logging.basicConfig(filename="testing.log", level=logging.DEBUG)
+        self.logger = logging.getLogger('Factory')
         self.nickname = nickname
         self.username = username
         self.realname = realname

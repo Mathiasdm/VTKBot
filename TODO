@@ -5,7 +5,7 @@
 - Add 'admin' list
 - Plugins:
     - Finish trivia plugin
-        * Categories!
+        * Categories! -- Add an 'ignore categories' using parseopts: http://docs.python.org/library/getopt.html
         * TOP x scores
         * Show scores for a player
         * Welcome players to the channel (or perhaps this should be a separate plugin? a greet plugin)
