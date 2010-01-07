@@ -31,6 +31,7 @@ from sqlalchemy.orm import clear_mappers
 import re
 import os
 import imp
+import logging
 
 from plugin import Plugin
 
@@ -297,6 +298,8 @@ class VTKBotFactory(ClientFactory):
 
     def __init__(self, realname="RealName", host="localhost", server="localhost", port=9999, nickname="NickName", username="UserName",
             databasefile="sqlite:///vtk.db", channels=["#test", "#test2"]):
+        logging.basicConfig(filename=settings.core_logfile,level=settings.core_loglevel)
+        self.logger = logging.getLogger('Factory')
         self.nickname = nickname
         self.username = username
         self.realname = realname
@@ -310,12 +313,12 @@ class VTKBotFactory(ClientFactory):
 
     def clientConnectionFailed(self, connector, reason):
         "We didn't manage to establish a connection to the server. Wait some time before trying again."
-        print 'Failed to establish a connection to the server. Trying again later...'
+        self.logger.warning('Failed to establish a connection to the server. Trying again later...')
         reactor.callLater(180, connector.connect)
 
     def clientConnectionLost(self, connector, reason):
         "We lost the connection to the server. Try again."
-        print 'Lost connection to the server. Trying again...'
+        self.logger.warning('Lost connection to the server. Trying again...')
         connector.connect()
 
     def load_plugins(self):
@@ -341,7 +344,7 @@ class VTKBotFactory(ClientFactory):
         #See what classes we managed to load
         pluginclasses = Plugin.__subclasses__()
 
-        print 'Plugins: ' + str(pluginclasses)
+        self.logger.info('Plugins: ' + str(pluginclasses))
         self.plugins = []
         for pluginclass in pluginclasses:
             plugin = object.__new__(pluginclass)
