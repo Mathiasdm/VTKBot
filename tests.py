@@ -1,3 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+"""
+VTKBot is an IRC bot
+Copyright (C) 2010 Mathias De Maré
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; version 2
+of the License, no other.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+"""
+
 import os
 import settings
 import unittest
@@ -370,7 +391,30 @@ class TestTriviaPlugin(unittest.TestCase):
                     break
             self.assert_(occurs)
 
+class TestTitlePlugin(unittest.TestCase):
+    def setUp(self):
+        settings.plugin_list = ["title.py"]
+        self.factory = MockVTKBotFactory(nickname=settings.core_nickname, server=settings.core_server, channels=settings.core_channels)
+        self.vtkbot = self.factory.buildProtocol(('localhost', 9999))
+        self.sender_nick = "blah"
+        self.sender_nickmask = "blih"
+        self.sender_host = "somehost.com"
+        self.channel = "#test"
+
+        for plugin in self.factory.plugins:
+            if plugin.__class__.__name__ == "Title":
+                self.trivia_plugin = plugin
+
+    def testTitleUTF8(self):
+        ascii_text = "<blah><title>lksjlkj</title></blah>"
+        unicode_text = u"<blah><title>éèéèéè</title></blah>"
+        print self.trivia_plugin.get_data_title(ascii_text)
+        print self.trivia_plugin.get_data_title(unicode_text)
+
 if __name__ == '__main__':
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestTitlePlugin)
+    unittest.TextTestRunner(verbosity=2).run(suite)
 
     suite = unittest.TestLoader().loadTestsFromTestCase(TestQuotePlugin)
     unittest.TextTestRunner(verbosity=2).run(suite)

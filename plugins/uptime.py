@@ -32,9 +32,10 @@ class Uptime(Plugin):
 
     def on_channel_message(self, vtkbot, nick, nickmask, hostmask, channel, message, match):
         uptime = datetime.now() - self.load_time
-        print 'HUPLA'
-        if uptime.days > 0:
+        if uptime.days > 1:
             vtkbot.send_channel_message(channel, "Ik ben al online gedurende %s dagen." % uptime.days)
+        elif uptime.days > 0:
+            vtkbot.send_channel_message(channel, "Ik ben al online gedurende %s dag." % uptime.days)
         elif uptime.seconds > 7200:
             vtkbot.send_channel_message(channel, "Ik ben al online gedurende %s uren." % (uptime.seconds/3600))
         elif uptime.seconds > 3600:
@@ -45,3 +46,6 @@ class Uptime(Plugin):
             vtkbot.send_channel_message(channel, "Ik ben al online gedurende %s minuut." % (uptime.seconds/60))
         else:
             vtkbot.send_channel_message(channel, "Ik ben al online gedurende %s seconden." % uptime.seconds)
+
+    def on_help(self, vtkbot, channel):
+        vtkbot.send_channel_message(channel, "Met uptime kan je weten hoe lang %s al online is. Typ '%s: uptime' om zijn uptime te weten." % (self.factory.nickname, self.factory.nickname))

@@ -56,6 +56,8 @@ class VTKBot(LineOnlyReceiver):
 
         #Join channels
         reactor.callLater(10, self.joinChannels)
+        #Execute 'connectionMade plugin commands'
+        reactor.callLater(11, self.on_connected)
 
     def joinChannels(self):
         for channel in self.factory.channels:
@@ -281,6 +283,11 @@ class VTKBot(LineOnlyReceiver):
     #A user quit
     def on_user_quit(self, nick, nickmask, hostmask):
         pass
+
+    def on_connected(self):
+        for plugin in self.factory.plugins:
+            if plugin.connected_rule != "":
+                plugin.on_connected(self)
 
     #=======================
     #  MODIFYING MESSAGES  #

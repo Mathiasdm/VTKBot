@@ -1,22 +1,22 @@
 - Unit tests! (in progress)
-- Switch to a logging framework
+- Switch to a logging framework (in progress)
 - Add more comments
 - More variable name consistency
 - Add 'admin' list
+- Expand regexes (ex. say plugin should be insensitive to capitalisation)
 - Plugins:
     - Finish trivia plugin
         * Categories! -- Add an 'ignore categories' using parseopts: http://docs.python.org/library/getopt.html
-        * TOP x scores
+        * TOP x scores (done for top 10)
         * Show scores for a player
         * Welcome players to the channel (or perhaps this should be a separate plugin? a greet plugin)
-        * Colours
         * Stop automatically when nobody answers for a few questions in a row
         * Points for answering X questions in a row when there are other players competing
         * Skip/stop by vote
+        * Quizmaster questions (first, player 1 can try, then player 2, ...)
+        * CalculationQuestions (give the first x prime numbers, ...)
     - Self kick plugin
     - Explanation plugin (Botname: explain WORD)
     - Wikipedia/google plugin
-    - Page title plugin
     - UNO plugin?
-    - Idle RPG plugin
-    - Show URL title plugin
+    - Revision control plugin

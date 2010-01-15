@@ -70,6 +70,8 @@ class Quote(Plugin):
 
     def on_help(self, vtkbot, channel):
         vtkbot.send_channel_message(channel, "Quote biedt de mogelijkheid mensen te citeren. Typ '%s: quote' om quotes weer te geven." % self.factory.nickname)
+        vtkbot.send_channel_message(channel, "Typ '%s: quote Naam' om quotes van Naam weer te geven." % self.factory.nickname)
+        vtkbot.send_channel_message(channel, "Typ '%s: quote Naam Tekst' om een quote voor Naam toe te voegen." % self.factory.nickname)
 
     def create_database_tables(self):
         metadata = MetaData()

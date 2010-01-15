@@ -30,3 +30,6 @@ class Repeat(Plugin):
 
     def on_channel_message(self, vtkbot, nick, nickmask, hostmask, channel, message, match):
         vtkbot.send_channel_message(channel, match.group(1))
+
+    def on_help(self, vtkbot, channel):
+        vtkbot.send_channel_message(channel, "Repeat herhaalt tekst. Typ '%s: repeat tekst' als je wil dat %s 'tekst' zegt." % (self.factory.nickname, self.factory.nickname))

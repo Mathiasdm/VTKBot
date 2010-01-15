@@ -37,7 +37,7 @@ class Title(Plugin):
         url = match.group(1)
         d = threads.deferToThread(self.get_url_title, url)
         d.addCallback(self.show_result, vtkbot, channel)
-        #print self.get_url_title(url) #(useful for debugging errors)
+#        print self.get_url_title(url) #(useful for debugging errors)
 
     def get_url_title(self, url):
         data = self.get_url_data(url)
@@ -51,6 +51,12 @@ class Title(Plugin):
             opener.addheaders = [('User-agent', 'Mozilla/5.0')]
             conn = opener.open(url)
             data = conn.read(10000)
+            info = conn.info()
+            try:
+                ignore, charset = info['Content-Type'].split('charset=')
+                data = data.decode(charset)
+            except:
+                data = data.decode('utf-8', 'ignore')
             return data
         except Exception:
             return None

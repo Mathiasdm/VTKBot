@@ -25,3 +25,7 @@ core_port = 6667
 core_channels = ["#vtk"]
 
 #plugin_list = ["help.py", "ping.py", "repeat.py", "say.py", "seen.py", "uptime.py"]
+
+plugins_idle_nick = "RPG"
+plugins_idle_own_name = "somename"
+plugins_idle_password = "somepassword"
