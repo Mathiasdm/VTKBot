@@ -124,6 +124,8 @@ class Trivia(Plugin):
         vtkbot.send_channel_message(channel, "%s heeft nu in totaal %s punten voor %s vragen!" % (nick, user.score, user.questioncount), bold=True)
 
     def on_next_question(self, vtkbot, channel):
+        if self.trivia_started[channel] == False:
+            return
         #Get a question from the database
         session = self.Session()
         max_question = session.query(Question).filter(Question.question_id == func.max(Question.question_id).select()).first()
