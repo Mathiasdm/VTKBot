@@ -19,10 +19,15 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+import logging
+
 core_nickname = "VTKBot"
 core_server = "vtk.ugent.be"
 core_port = 6667
 core_channels = ["#vtk"]
+
+core_logfile = "vtkbot.log"
+core_loglevel = logging.DEBUG
 
 #plugin_list = ["help.py", "ping.py", "repeat.py", "say.py", "seen.py", "uptime.py"]
 
