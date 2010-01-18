@@ -150,9 +150,10 @@ class VTKBot(LineOnlyReceiver):
             return
 
         #KICK message
-        match = re.match(":([^ ]*?)!([^ ]*?)@([^ ]*?) KICK (.*?) %s :" % self.factory.nickname, message)
+        match = re.match(":([^ ]*?)!([^ ]*?)@([^ ]*?) KICK ([^ ]*?) ([^ ]*?) :", message)
         if match:
-            self.on_kick(match.group(1), match.group(2), match.group(3), match.group(4))
+            print 'KICKIII'
+            self.on_kick(match.group(1), match.group(2), match.group(3), match.group(4), match.group(5))
 
         #NOTICE message
         match = re.match("[^ ]* NOTICE ([^ ]*) :(.*)", message)
@@ -226,10 +227,10 @@ class VTKBot(LineOnlyReceiver):
         pass
 
     #Received a channel kick
-    def on_kick(self, nick, nickmask, hostmask, channel):
+    def on_kick(self, nick, nickmask, hostmask, channel, target):
         for plugin in self.factory.plugins:
             if plugin.channel_kick_rule != "":
-                plugin.on_kick(self, nick, nickmask, hostmask, channel)
+                plugin.on_kick(self, nick, nickmask, hostmask, channel, target)
 
     #Received a notice (careful when overriding, there are a lot of subnotices!)
     def on_notice(self, nick, text):
@@ -328,7 +329,7 @@ class VTKBotFactory(ClientFactory):
     def clientConnectionLost(self, connector, reason):
         "We lost the connection to the server. Try again."
         self.logger.warning('Lost connection to the server. Trying again...')
-        connector.connect()
+        reactor.callLater(60, connector.connect)
 
     def load_plugins(self):
 

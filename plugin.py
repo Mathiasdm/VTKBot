@@ -37,7 +37,7 @@ class Plugin(object):
     def on_connected(self, vtkbot):
         pass
 
-    def on_kick(self, vtkbot, nick, nickmask, hostmask, channel):
+    def on_kick(self, vtkbot, nick, nickmask, hostmask, channel, target):
         pass
 
     def create_database_tables(self):

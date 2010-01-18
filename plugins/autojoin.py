@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from plugin import Plugin
+from twisted.internet import reactor
 import re
 
 class Autojoin(Plugin):
@@ -28,6 +29,8 @@ class Autojoin(Plugin):
         Plugin.__init__(self, factory)
         self.channel_kick_rule = "*"
 
-    def on_kick(self, vtkbot, nick, nickmask, hostmask, channel):
-        if nick == factory.nickname:
-            vtkbot.send_join(channel)
+    def on_kick(self, vtkbot, nick, nickmask, hostmask, channel, target):
+        print 'KICK'
+        print target
+        if target == self.factory.nickname:
+            reactor.callLater(1, vtkbot.send_join, channel)
