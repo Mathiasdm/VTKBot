@@ -19,26 +19,15 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-class Plugin(object):
+from plugin import Plugin
+import re
+
+class Autojoin(Plugin):
 
     def __init__(self, factory):
-        self.factory = factory
-        self.channel_message_rule = ""
-        self.channel_kick_rule = ""
-        self.user_join_rule = ""
-        self.connected_rule = ""
-
-    def on_channel_message(self, vtkbot, nick, nickmask, hostmask, channel, message, match):
-        pass
-
-    def on_user_join(self, vtkbot, nick, nickmask, hostmask, channel):
-        pass
-
-    def on_connected(self, vtkbot):
-        pass
+        Plugin.__init__(self, factory)
+        self.channel_kick_rule = "*"
 
     def on_kick(self, vtkbot, nick, nickmask, hostmask, channel):
-        pass
-
-    def create_database_tables(self):
-        pass
+        if nick == factory.nickname:
+            vtkbot.send_join(channel)

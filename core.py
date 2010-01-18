@@ -227,7 +227,9 @@ class VTKBot(LineOnlyReceiver):
 
     #Received a channel kick
     def on_kick(self, nick, nickmask, hostmask, channel):
-        pass
+        for plugin in self.factory.plugins:
+            if plugin.channel_kick_rule != "":
+                plugin.on_kick(self, nick, nickmask, hostmask, channel)
 
     #Received a notice (careful when overriding, there are a lot of subnotices!)
     def on_notice(self, nick, text):
