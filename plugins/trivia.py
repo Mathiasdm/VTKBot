@@ -54,7 +54,7 @@ class Trivia(Plugin):
             self.on_trivia_top(vtkbot, channel)
             return
 
-        if self.trivia_started[channel]:
+        if channel in self.trivia_started and self.trivia_started[channel]:
             match = re.match("%s: trivia stop" % self.factory.nickname, message)
             if match:
                 self.on_trivia_stop(vtkbot, channel)

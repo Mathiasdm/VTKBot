@@ -202,6 +202,12 @@ class VTKBot(LineOnlyReceiver):
             self.on_banlist(oldbanlist)
             return
 
+        #Server closes link
+        match = re.match("ERROR :Closing Link: ", message)
+        if match:
+            self.on_link_close()
+            return
+
     #Received a banlist
     def on_banlist(self, banlist):
         pass
@@ -291,6 +297,9 @@ class VTKBot(LineOnlyReceiver):
         for plugin in self.factory.plugins:
             if plugin.connected_rule != "":
                 plugin.on_connected(self)
+
+    def on_link_close(self):
+        self.transport.loseConnection() #Lose the connection, let the factory reconnect
 
     #=======================
     #  MODIFYING MESSAGES  #
